@@ -1,1 +1,9 @@
 This file contects the steps necessary in ordert to continue with our project adamadrina. 
+
+13-Nov-2017
+Add to the .config file the following things:
+ - .config
+- build/-kernel sources/.config
+- Device Tree: Color sensor/ Gyroscope
+
+
