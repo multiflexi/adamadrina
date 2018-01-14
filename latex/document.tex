@@ -223,15 +223,18 @@ Madrid 2018
 
 
 \chapter{Embedded Linux}
-Whole project was done using Ubuntu GNOME 14.04.5 LTS Trusty Tahr, running in VMware Workstation 14.1.1, hosted by Kali Linux 2017.2. First we had to compile embedded Linux using Buildroot maintained by Peter Korsgaard, a tool simplifying and automating the building process of bootable Linux system for embedded solutions using cross-compilation for architectural independence. When using Buildroot we followed instructions given us in the document for lab. We set parameters accordingly to our build target BeagleBone Black which uses Texas Instruments Sitara AM3358, an ARMv7-A processor with one Cortex-A8  core. Our build uses custom Linux kernel 3.12 which includes patches for Texas Instruments SoCs. Linux is booted using U-Boot 2016.03 for processors from AM335x series. Build includes gdbserver for remote debugging, openssh for remote connection and set of elementary programs BusyBox.
+Whole project was done using Ubuntu GNOME 14.04.5 LTS Trusty Tahr, running in VMware Workstation 14.1.1, hosted by Kali Linux 2017.2. First we had to compile embedded Linux using Buildroot maintained by Peter Korsgaard, a tool simplifying and automating the building process of bootable Linux system for embedded solutions using cross-compilation for architectural independence. When using Buildroot we followed instructions given us in the document for lab. We set parameters accordingly to our build target BeagleBone Black which uses Texas Instruments Sitara AM3358, an ARMv7-A processor with one Cortex-A8  core. Our build uses custom Linux kernel 3.12 which includes patches for Texas Instruments SoCs. Linux is booted using U-Boot 2016.03 for processors from AM335x series. Build includes gdbserver for remote debugging, openssh for remote connection and set of elementary programs BusyBox. Two users were created: prdel and root both with password ada.
 
 After successful compilation we created two partitions on SD card: FAT32 boot partition which includes the X-Loader (MLO), U-boot binary (u-boot.bin), Linux kernel (zImage) and device tree binaries (*.dtb), and Linux filesystem partition which is created from rootfs.ext2 file. This was one of the tricky parts and required several attempts.
 
-When BBB successfully booted, several settings was changed using root user. Firstly, in settings of ssh deamon root user was allowed to login with password. Secondly, device was configured to use static IP address for direct connection to VM in order to use remote debugging.
+When BBB successfully booted, several settings was changed using root user. Firstly, in settings of ssh deamon root user was allowed to login with password. Secondly, device was configured to use static IP address for direct connection to VM in order to use remote debugging. We had to rewrite the filesystem several times because it was corrupted.
+
 \chapter{Application and sensors}
 First step in connecting the TCS34725 RGB colour sensor and the  L3GD20H 3-axis gyroscope was soldiering them onto HAT for practical reasons. Sensors use ground aka pins 1 and 2, 3.3 V from pins 3 and 4 for power, pins 17 and 19 for I\textsuperscript{2}C clock line and pins 18 and 20 for I\textsuperscript{2}C data line.
 
-For development we used Eclipse Oxygen from October 2017. We set up remote debugging and cross compiling according to instructions for lab document.
+For development we used Eclipse Oxygen from October 2017. We set up remote debugging and cross compiling according to instructions for lab document. We used direct connection for remote debugging when both devices were in 192.168.1.0 subnet. Developing and remote debugging in Eclipse Oxygen was not without complications and is definitely not stable and reliable.
+
+Project, application and this document, is available in Git \url{https://github.com/multiflexi/adamadrina.git}
 
 \renewcommand{\acronymname}{List of acronyms}
 \printglossaries
