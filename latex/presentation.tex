@@ -21,9 +21,9 @@
 
 
 \begin{document}
-	\frame{\titlepage}
-	\begin{frame}
-		\frametitle{Goal}
+\frame{\titlepage}
+\begin{frame}
+	\frametitle{Tasks}
 		\begin{itemize}
 			\item \textbf{Compile embedded Linux for BeagleBone Black}
 			\item \textbf{Develop application which uses}
@@ -32,12 +32,100 @@
 				\item \textbf{L3GD20H 3-axis gyroscope}
 			\end{itemize}
 		\end{itemize}
-	\end{frame}
-	\begin{frame}
-	\frametitle{Introduction}
-		\begin{figure}[h]
+\end{frame}
+\begin{frame}
+	\frametitle{Compiling Linux}
+		\begin{itemize}
+			\item Buildroot
+			\begin{itemize}
+				\item custom Linux kernel 3.12 with patches for Texas Instruments SoCs
+				\item U-Boot 2016.03
+				\item gdbserver for remote debugging
+				\item openssh for remote connection
+				\item set of elementary programs BusyBox
+			\end{itemize}
+		\end{itemize}
+\end{frame}
 
-		\end{figure} 
+\begin{frame}
+	\frametitle{Files}
+		\begin{itemize}
+			\item FAT32 boot partition
+			\begin{itemize}
+				\item X-Loader - MLO
+				\item U-boot binary - u-boot.bin
+				\item Linux kernel - zImage
+			\end{itemize}
+		\item Linux partition
+			\begin{itemize}
+				\item filesystem - rootfs.ext2
+			\end{itemize}
+		\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Configuration}
+		\begin{itemize}
+			\item Allowed remote login for root user using password
+					\begin{itemize}
+						\item /etc/ssh/sshd\_config
+						\item PermitRootLogin yes
+						\item otherwise turn off!!!
+					\end{itemize}
+			\item Set static IP address
+					\begin{itemize}
+						\item /etc/network/interfaces
+						\item iface eth0 inet static \\address 192.168.1.2 \\netmask 255.255.255.0	
+					\end{itemize}
+		\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Development}
+		\begin{itemize}
+			\item IDE Eclipse Oxygen from October 2017
+			\item remote debugging 
+			\item both devices in 192.168.1.0 subnet
+		\end{itemize}
+\end{frame}
+\begin{frame}
+	\frametitle{Sensors}
+	\begin{figure}[!ht]
+		\centering
+		\begin{subfigure}[b]{0.49\textwidth}
+			\includegraphics[width=0.88\textwidth]{{"img/rgb"}.jpg}
+			\caption{TCS34725 RGB colour sensor}
+			\label{fig:rgb}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.49\textwidth}
+			\includegraphics[width=0.98\textwidth]{{"img/gyro"}.jpg}
+			\caption{L3GD20H 3-axis gyroscope}
+			\label{fig:gyro}
+		\end{subfigure}
+	\end{figure}
+\end{frame}
+\begin{frame}
+\frametitle{Soldering}
+\begin{figure}[!ht]
+	\caption{BeagleBone Black with HAT with sensors}
+	\label{fig:with_hat}
+	\centering
+	\includegraphics[width=0.78\textwidth]{{"img/withHATsideways"}.jpg}
+\end{figure}
+
+\end{frame}
+	\begin{frame}
+\frametitle{Introduction}
+\begin{figure}[h]
+	
+\end{figure} 
+
+\end{frame}
+	\begin{frame}
+\frametitle{Introduction}
+\begin{figure}[h]
+	
+\end{figure} 
 
 \end{frame}
 

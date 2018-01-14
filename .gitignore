@@ -26,3 +26,9 @@
 latex/img/logo-eps-converted-to\.pdf
 
 latex/img/logo2-eps-converted-to\.pdf
+
+*.nav
+
+*.out
+
+*.snm
