@@ -34,3 +34,7 @@ latex/img/logo2-eps-converted-to\.pdf
 *.snm
 
 latex/img/withHAT\.jpg
+
+*.bak
+
+*.sav
