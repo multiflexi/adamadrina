@@ -86,7 +86,36 @@
 			\item IDE Eclipse Oxygen from October 2017
 			\item remote debugging 
 			\item both devices in 192.168.1.0 subnet
+			\item root user
 		\end{itemize}
+\end{frame}
+\begin{frame}
+\frametitle{Cross-Compilation Configuration}
+\begin{itemize}
+	\item Adding a line for cross-compiling tools to the PATH variable in the file “.profile”:\\
+	PATH="/home/jaroslav/buildroot-2016-05/buildroot/output/host/usr/bin:\$PATH”
+	\item Creation of C/C++ project: gyroRGB 
+	\item Set the toolchain: Cross GCC
+	\item Configuration: Debug [Activate]
+	\item Prefix: arm-buildroot-linux-uclibcgnueabihf-
+	\item Path: /home/jaroslav/buildroot-2016.05/output/host/usr/bin
+\end{itemize}
+\textbf{The compiling process is made in Linux x86 machine and the execution in ARM architecture (BBB)!}
+\end{frame}
+\begin{frame}
+\frametitle{Development III}
+Run \textbf{Debug Configuration} \\
+Open a new \textbf{C/C++ Remote Application} and the code of the program to be debugged
+\begin{itemize}
+	\item Project name
+	\item Build Configuration: Use Active 
+	\item C/C++ Application: browse  executable
+	\item Remote Absolute File Path for C/C++ Application
+	\item Commands to execute before application: chmod +x location path of the application
+	\item \textbf{GDB Debugger:} Location path of the \textbf{gdb}
+	\item \textbf{GDB Command:} Location path of the \textbf{.gdbinit} file
+	\item \textbf{Debugger Options:} Gdbserver Settings / Port number
+\end{itemize}
 \end{frame}
 \begin{frame}
 	\frametitle{Sensors}
