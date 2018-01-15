@@ -224,6 +224,16 @@ Madrid 2018
 \setcounter{page}{1}
 \tableofcontents
 
+\lstset{language=C,
+	backgroundcolor=\color{white},   % choose the background color
+	basicstyle=\footnotesize,        % size of fonts used for the code
+	breaklines=true,                 % automatic line breaking only at whitespace
+	captionpos=b,                    % sets the caption-position to bottom
+	commentstyle=\color{mygreen},    % comment style
+	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+	keywordstyle=\color{blue},       % keyword style
+	stringstyle=\color{mymauve},     % string literal style
+}
 
 \chapter{Embedded Linux}
 Whole project was done using Ubuntu GNOME 14.04.5 LTS Trusty Tahr, running in VMware Workstation 14.1.1, hosted by Kali Linux 2017.2. First we had to compile embedded Linux using Buildroot maintained by Peter Korsgaard, a tool simplifying and automating the building process of bootable Linux system for embedded solutions using cross-compilation for architectural independence. When using Buildroot we followed instructions given us in the document for lab. We set parameters accordingly to our build target BeagleBone Black which uses Texas Instruments Sitara AM3358, an ARMv7-A processor with one Cortex-A8  core. Our build uses custom Linux kernel 3.12 which includes patches for Texas Instruments SoCs. Linux is booted using U-Boot 2016.03 for processors from AM335x series. Build includes gdbserver for remote debugging, openssh for remote connection and set of elementary programs BusyBox. Two users were created: prdel and root both with password ada.
@@ -280,19 +290,84 @@ First step in connecting the TCS34725 RGB colour sensor and the L3GD20H 3-axis g
 
 For development in C we used Eclipse Oxygen from October 2017. We set up remote debugging and cross compiling according to instructions for lab document. We used direct connection over Ethernet for remote debugging when both devices were in 192.168.1.0 subnet. Developing and remote debugging in Eclipse Oxygen was not without complications and is definitely not stable and reliable.
 
+
+In application we first initialize the I\textsuperscript{2}C bus and open it for reading to find out if the I\textsuperscript{2}C is available. The TCS34725 sensor address is $0x29$ as mentioned in \cite{rgb}. 
+
+\begin{lstlisting}[language=C,frame=single]
+// Create I2C bus
+int file;
+int file2;
+char *bus = "/dev/i2c-1";
+char *bus2 = "/dev/i2c-2";
+
+if ((file = open(bus, O_RDWR)) < 0)
+{
+	printf("Failed to open the bus. \n");
+	exit(1);
+}
+else
+{ //the bus of RGB sensor was successfully opened
+	printf("It's alive! \n");
+	
+	
+	
+	// Get I2C device, TCS34725 I2C address is 0x29(41)
+	ioctl(file, I2C_SLAVE, 0x29);
+\end{lstlisting} 
+
+According to Linux description of the command the ioctl() system call manipulates the underlying device parameters of special files. In particular, many operating characteristics of character special files (e.g. terminals) may be controlled with  ioctl() requests.
+
+We refer to the table in \cite{rgb} to configure the table config we have created as you can see the address on the top and the role of each register. With this method we initialize other registers.
+
+\begin{lstlisting}[language=C,frame=single]
+// Select enable register(0x80)
+// Power ON, RGBC enable, wait time disable(0x03)
+char config[2] = {0};
+config[0] = 0x80;
+config[1] = 0x03;
+write(file, config, 2);
+
+// Select ALS time register(0x81)
+// Atime = 700 ms(0x00)
+config[0] = 0x81;
+config[1] = 0x00;
+write(file, config, 2);
+// Select Wait Time register(0x83)
+// WTIME : 2.4ms(0xFF)
+config[0] = 0x83;
+config[1] = 0xFF;
+write(file, config, 2);
+// Select control register(0x8F)k
+// AGAIN = 1x(0x00)
+config[0] = 0x8F;
+config[1] = 0x00;
+write(file, config, 2);
+sleep(1);
+\end{lstlisting} 
+
+For the last part we just needed to know the formula of the luminance with the weight of the colour luminance for each colour.
+
+\begin{lstlisting}[language=C,frame=single]
+// Calculate luminance
+float luminance = (-0.32466) * (red) + (1.57837) * (green) + (-0.73191) * (blue);
+if(luminance < 0)
+{
+	luminance = 0;
+}
+
+// Output data to screen
+printf("Red color luminance : %d lux \n", red);
+printf("Green color luminance : %d lux \n", green);
+printf("Blue color luminance : %d lux \n", blue);
+printf("IR  luminance : %d lux \n", cData);
+printf("Ambient Light Luminance : %.2f lux \n", luminance);
+}
+\end{lstlisting} 
+
 Project, application, presentation and this document, is available in Git repository \url{https://github.com/multiflexi/adamadrina.git}
 
 \chapter{Code}
-\lstset{language=C,
-	backgroundcolor=\color{white},   % choose the background color
-	basicstyle=\footnotesize,        % size of fonts used for the code
-	breaklines=true,                 % automatic line breaking only at whitespace
-	captionpos=b,                    % sets the caption-position to bottom
-	commentstyle=\color{mygreen},    % comment style
-	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
-	keywordstyle=\color{blue},       % keyword style
-	stringstyle=\color{mymauve},     % string literal style
-}
+
 \begin{lstlisting}[language=C]
 // Distributed with a free-will license.
 // Use it any way you want, profit or free, provided it fits in the licenses of its associated works.
