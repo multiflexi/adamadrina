@@ -7,7 +7,8 @@
 \usepackage{wrapfig}
 \usepackage{subcaption}
 \usepackage{xmpmulti}
-
+\usepackage[binary-units]{siunitx}
+\usepackage{listings}
 
 
 \newcommand\ytl[2]{
@@ -119,6 +120,13 @@ Open a new \textbf{C/C++ Remote Application} and the code of the program to be d
 \end{frame}
 \begin{frame}
 	\frametitle{Sensors}
+	\begin{flushright}
+GND $\longrightarrow$ 1\&2\\
+\SI{3.3}{\volt} $\longrightarrow$ 3\&4\\
+Clock $\longrightarrow$ 17\&19\\
+Data $\longrightarrow$ 18\&20
+\end{flushright}
+\vspace{-40px}
 	\begin{figure}[!ht]
 		\centering
 		\begin{subfigure}[b]{0.49\textwidth}
@@ -143,6 +151,19 @@ Open a new \textbf{C/C++ Remote Application} and the code of the program to be d
 \end{figure}
 
 \end{frame}
+
+\begin{frame}
+\frametitle{Implementation - I\textsuperscript{2}C Interface}
+
+\begin{figure}[!ht]
+ \hspace*{-100px} \includegraphics[width=0.28\textwidth,]{{"img/includes"}.png}
+\end{figure}
+\vspace{-25px}
+\begin{figure}[!ht]
+\includegraphics[width=0.58\textwidth]{{"img/init"}.png}
+\end{figure}
+\end{frame}
+
 	\begin{frame}
 \frametitle{Implementation - RGB sensor}
 \begin{itemize}
@@ -219,5 +240,7 @@ Open a new \textbf{C/C++ Remote Application} and the code of the program to be d
 	\includegraphics[width=0.68\textwidth]{{"img/table5"}.png}
 \end{figure}
 \end{frame}
+
+
 
 \end{document}

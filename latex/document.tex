@@ -263,7 +263,7 @@ iface eth0 inet static
 	address 192.168.1.2
 	netmask 255.255.255.0
 \end{lstlisting} 
- We had to rewrite the filesystem several times because it was corrupted.
+ We had to rewrite the filesystem several times because it was corrupted. Other then mentioned deviations we followed the provided document for labs \cite{bbb}.
 
 \chapter{Application development and connecting of sensors}
 First step in connecting the TCS34725 RGB colour sensor and the L3GD20H 3-axis gyroscope was soldiering them onto HAT for practical reasons. Sensors use ground aka pins 1 and 2, 3.3 V from pins 3 and 4 for power, pins 17 and 19 for I\textsuperscript{2}C clock line and pins 18 and 20 for I\textsuperscript{2}C data line.
@@ -290,6 +290,45 @@ First step in connecting the TCS34725 RGB colour sensor and the L3GD20H 3-axis g
 
 For development in C we used Eclipse Oxygen from October 2017. We set up remote debugging and cross compiling according to instructions for lab document. We used direct connection over Ethernet for remote debugging when both devices were in 192.168.1.0 subnet. Developing and remote debugging in Eclipse Oxygen was not without complications and is definitely not stable and reliable.
 
+First, for cross-compilation we created a workspace location. Inside this workspace, we created our Eclipse C/C++ project called: gyroRGB.  After, we set the configuration of the toolchain by selecting Cross GCC. We used a Debug [Activate] configuration, as well as the GNU Make Builder. In addition, we had to put the location paths of the toolchain, the libraries and the includes. The following two figures show the whole configuration:
+
+\begin{figure}[!ht]
+	\centering
+	\begin{subfigure}[b]{0.99\textwidth}
+		\includegraphics[width=0.98\textwidth]{{"img/Screenshot from 2018-01-17 07:06:07"}.png}
+		\caption{Includes}
+		\label{fig:includes}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.99\textwidth}
+		\includegraphics[width=0.98\textwidth]{{"img/Screenshot from 2018-01-17 07:06:45"}.png}
+		\caption{Libraries}
+		\label{fig:libs}
+	\end{subfigure}
+\end{figure}
+Once the code was compiled, it was necessary to debug it to be sure that we did not make any mistakes when we were coding.  The configuration window is shown in the following image: 
+
+\begin{figure}[!ht]
+	\caption{Remote debugging}
+	\label{fig:ssh}
+	\centering
+	\includegraphics[width=0.98\textwidth]{{"img/Screenshot from 2018-01-17 07:07:05"}.png}
+\end{figure}
+
+As it is possible to see there, we set the project name, the IP address of our BBB: 192.168.1.2, the remote path of the directory and application. In addition, we select an Automatic debugging mode and a root as our user profile. Moreover, we set the paths of the gdb and gdb server, which allows connecting our program with a remote GDB via target remote, our BBB. Once the configuration has been completed, we debugged our code. 
+
+At the beginning we could not finish the debugging process successfully since we got several error messages in the console window. Thanks to the breakpoint tool, we were able to find that the errors came from a wrong register address allocation. Therefore we had to review the datasheet of both sensors \cite{rgb,gyro} in order to allocate registers available for our purpose. In addition, we found some small syntax errors and variables that have been named with the same name for different functions. 
+
+After all the mistakes were fixed, we got the following message in the terminal:   
+
+\begin{figure}[!ht]
+	\caption{Terminal}
+	\label{fig:terminal}
+	\centering
+	\includegraphics[width=0.98\textwidth]{{"img/26972889_1658152377578349_208725069_o"}.jpg}
+\end{figure}
+
+
+Our RGB sensor and gyroscope were alive. We made some attempts with the RGB sensor and discovered that it worked correctly. For example, we covered the sensor with a red paper and the sensor recognized the colour red, as the image above shows. So it worked correctly. However, we found problems when we were testing the gyroscope. The values we obtained were not configured with respect to a reference. That is why we did not obtain zero for all the Cartesian coordinates X, Y, Z when the gyro was in the (0,0,0) position. We rewrite part of the code to fix this anomaly behaviour, but we could find the perfect solution, since sometimes it worked and some times do not. 
 
 In application we first initialize the I\textsuperscript{2}C bus and open it for reading to find out if the I\textsuperscript{2}C is available. The TCS34725 sensor address is $0x29$ as mentioned in \cite{rgb}. 
 
@@ -315,7 +354,7 @@ else
 	ioctl(file, I2C_SLAVE, 0x29);
 \end{lstlisting} 
 
-According to Linux description of the command the ioctl() system call manipulates the underlying device parameters of special files. In particular, many operating characteristics of character special files (e.g. terminals) may be controlled with  ioctl() requests.
+According to Linux description of the command the ioctl() system call manipulates the underlying device parameters of special files. In particular, many operating characteristics of character special files (e.g. terminals) may be controlled with ioctl() requests.
 
 We refer to the table in \cite{rgb} to configure the table config we have created as you can see the address on the top and the role of each register. With this method we initialize other registers.
 
@@ -364,6 +403,7 @@ printf("Ambient Light Luminance : %.2f lux \n", luminance);
 }
 \end{lstlisting} 
 
+
 Project, application, presentation and this document, is available in Git repository \url{https://github.com/multiflexi/adamadrina.git}
 
 \chapter{Code}
@@ -371,7 +411,7 @@ Project, application, presentation and this document, is available in Git reposi
 \begin{lstlisting}[language=C]
 // Distributed with a free-will license.
 // Use it any way you want, profit or free, provided it fits in the licenses of its associated works.
-// adapted by Andrea Vallejo, Jaroslav Svoboda and Diallo
+// adapted by Andrea Vallejo, Jaroslav Svoboda and Diallo Sadou
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -484,21 +524,24 @@ sleep(1);
 
 // Read 6 bytes of data
 // lsb first
-// Read xGyro lsb data from register(0x28)
+// for the x axe (xGyro) we are going to read the least significant bit  from register(0x28)
 char reg[1] = {0x28};
 write(file2, reg, 1);
+
 char datai[1] = {0};
 if(read(file2, datai, 1) != 1)
 {
 printf("Error : Input/Output Error \n");
 exit(1);
 }
+// we get first byte in data 0
 char data_0 = datai[0];
 
-// Read xGyro msb data from register(0x29)
+// The same we read the  most significant bit  data from register(0x29)
 reg[0] = 0x29;
 write(file2, reg, 1);
 read(file2, datai, 1);
+// we get the byte that we have read in data 1
 char data_1 = datai[0];
 
 // Read yGyro lsb data from register(0x2A)
@@ -511,6 +554,7 @@ char data_2 = datai[0];
 reg[0] = 0x2B;
 write(file2, reg, 1);
 read(file2, datai, 1);
+// same operation 
 char data_3 = datai[0];
 
 // Read zGyro lsb data from register(0x2C)
@@ -525,8 +569,16 @@ write(file2, reg, 1);
 read(file2, datai, 1);
 char data_5 = datai[0];
 
-// Convert the data
+/*To convert our data and get a int value 
+each each time we multiply by 256 that are going to decal the first bit position 
+to eight  rank to the left so we have 8 bits where we can add data 0
+
+*/
 int xGyro = (data_1 * 256 + data_0);
+/* To avoid the possibility to have a positive  number that have more than 16 bits
+we retire 65356 to have the oposite of the number that can be in 16 bits.
+so with that we have the value of the rotation for each sense of rotation
+*/
 if(xGyro > 32767)
 {
 xGyro -= 65536;

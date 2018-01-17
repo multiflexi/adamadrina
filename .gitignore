@@ -38,3 +38,5 @@ latex/img/withHAT\.jpg
 *.bak
 
 *.sav
+
+gyroRGB2\.c

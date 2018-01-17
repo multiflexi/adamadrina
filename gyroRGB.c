@@ -1,6 +1,6 @@
 // Distributed with a free-will license.
 // Use it any way you want, profit or free, provided it fits in the licenses of its associated works.
-// adapted by Andrea Vallejo, Jaroslav Svoboda and Diallo
+// adapted by Andrea Vallejo, Jaroslav Svoboda and Diallo Sadou
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -113,21 +113,24 @@ int main()
 
 					// Read 6 bytes of data
 					// lsb first
-					// Read xGyro lsb data from register(0x28)
+					// for the x axe (xGyro) we are going to read the least significant bit  from register(0x28)
 					char reg[1] = {0x28};
 					write(file2, reg, 1);
+                
 					char datai[1] = {0};
 					if(read(file2, datai, 1) != 1)
 					{
 						printf("Error : Input/Output Error \n");
 						exit(1);
 					}
+                    // we get first byte in data 0
 					char data_0 = datai[0];
 
-					// Read xGyro msb data from register(0x29)
+					// The same we read the  most significant bit  data from register(0x29)
 					reg[0] = 0x29;
 					write(file2, reg, 1);
 					read(file2, datai, 1);
+                    // we get the byte that we have read in data 1
 					char data_1 = datai[0];
 
 					// Read yGyro lsb data from register(0x2A)
@@ -140,6 +143,7 @@ int main()
 					reg[0] = 0x2B;
 					write(file2, reg, 1);
 					read(file2, datai, 1);
+                    // same operation 
 					char data_3 = datai[0];
 
 					// Read zGyro lsb data from register(0x2C)
@@ -154,8 +158,16 @@ int main()
 					read(file2, datai, 1);
 					char data_5 = datai[0];
 
-					// Convert the data
+					/*To convert our data and get a int value 
+                    each each time we multiply by 256 that are going to decal the first bit position 
+                    to eight  rank to the left so we have 8 bits where we can add data 0
+
+                    */
 					int xGyro = (data_1 * 256 + data_0);
+                    /* To avoid the possibility to have a positive  number that have more than 16 bits
+                    we retire 65356 to have the oposite of the number that can be in 16 bits.
+                    so with that we have the value of the rotation for each sense of rotation
+                    */
 					if(xGyro > 32767)
 					{
 						xGyro -= 65536;
